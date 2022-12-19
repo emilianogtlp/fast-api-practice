@@ -65,7 +65,7 @@ def delete_post(id:int):
     my_posts.pop(index)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
-@app.put("/posts/{id}")
+@app.put("/posts/{id}",status_code=status.HTTP_200_OK)
 def update_post(id:int, post:Post):
     index = find_index_post(id)
 
