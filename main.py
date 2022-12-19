@@ -15,6 +15,11 @@ def find_post(id):
         if i['id'] == id:
             return i
 
+def find_index_post(id):
+    for i, p in enumerate(my_posts):
+        if p['id'] == id:
+            return i
+
 class Post(BaseModel):
     title: str
     content: str
@@ -47,3 +52,14 @@ def get_post(id:int, response: Response):
             , detail=f"Post with id {id} was not found")
     
     return {"post_detail":post}
+
+@app.delete("/posts/{id}",status_code=status.HTTP_204_NO_CONTENT)
+def delete_post(id:int):
+
+    index = find_index_post(id)
+
+    if not index:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Post with id {id} does not exist")
+    
+    my_posts.pop(index)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
