@@ -65,12 +65,12 @@ def create_posts(post:Post):
 @app.get("/posts/{id}") #Path parameter
 def get_post(id:int, response: Response):
     cursor.execute(
-        """SELECT * FROM post WHERE id = '%s' RETURNING *;""",
-        (id)
+        """SELECT * FROM post WHERE id = %s;""",
+        (str(id))
     )
     post = cursor.fetchone()
-    conn.commit()
-    
+    print(post)
+    #conn.commit()
     if not post:
         raise HTTPException(
             status_code = status.HTTP_404_NOT_FOUND
