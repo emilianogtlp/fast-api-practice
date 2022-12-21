@@ -23,17 +23,6 @@ while True:
         print("Connection to database failed")
         time.sleep(3)
 
-my_posts = [{"title":"First Post", "content":"First Content", "published":True, "id":1},{"title":"Second Post", "content":"Second Content", "published":True,"id":2}]
-
-def find_post(id):
-    for i in my_posts:
-        if i['id'] == id:
-            return i
-
-def find_index_post(id):
-    for i, p in enumerate(my_posts):
-        if p['id'] == id:
-            return i
 
 class Post(BaseModel):
     title: str
@@ -46,11 +35,13 @@ class Post(BaseModel):
 def root():
     return {"Hello":"World"}
 
+
 @app.get("/posts")
 def get_posts():
     cursor.execute("""SELECT * FROM post """)
     posts = cursor.fetchall()
     return {"data":posts}
+
 
 @app.post("/posts",status_code=status.HTTP_201_CREATED)
 def create_posts(post:Post):
@@ -62,6 +53,7 @@ def create_posts(post:Post):
     conn.commit() #Commit the changes
     return {"data":new_post}
 
+
 @app.get("/posts/{id}") #Path parameter
 def get_post(id:int, response: Response):
     cursor.execute(
@@ -71,6 +63,7 @@ def get_post(id:int, response: Response):
     post = cursor.fetchone()
     print(post)
     #conn.commit()
+    
     if not post:
         raise HTTPException(
             status_code = status.HTTP_404_NOT_FOUND
@@ -81,25 +74,29 @@ def get_post(id:int, response: Response):
 
 @app.delete("/posts/{id}",status_code=status.HTTP_204_NO_CONTENT)
 def delete_post(id:int):
-    index = find_index_post(id)
-
-    if index == None:
+    cursor.execute(
+        """DELETE FROM post WHERE id = %s RETURNING *""",
+        (str(id))
+    )
+    response = cursor.fetchone()
+    conn.commit()
+    
+    if not response:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
         detail=f"Post with id {id} does not exist")
     
-    my_posts.pop(index)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 @app.put("/posts/{id}",status_code=status.HTTP_200_OK)
 def update_post(id:int, post:Post):
-    index = find_index_post(id)
-
-    if index == None:
+    cursor.execute(
+        """UPDATE post SET title = %s, content = %s, published = %s WHERE id = %s RETURNING *""", 
+        (post.title,post.content,post.published,str(id))
+    )
+    conn.commit()
+    updated_post = cursor.fetchone()
+    if updated_post == None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
         detail=f"Post with id {id} does not exist")
-    
-    post_dict = post.dict()
-    post_dict['id'] = id
-    my_posts[index] = post_dict
 
-    return {'data':post_dict}
+    return {'data':updated_post}
