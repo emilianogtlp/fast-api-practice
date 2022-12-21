@@ -57,14 +57,19 @@ def create_posts(post:Post):
     cursor.execute(
         """INSERT INTO post (title, content, published) VALUES (%s,%s,%s) RETURNING *;""",
         (post.title,post.content,post.published)
-        )
+    )
     new_post = cursor.fetchone()
-    conn.commit()
+    conn.commit() #Commit the changes
     return {"data":new_post}
 
 @app.get("/posts/{id}") #Path parameter
 def get_post(id:int, response: Response):
-    post = find_post(id)
+    cursor.execute(
+        """SELECT * FROM post WHERE id = '%s' RETURNING *;""",
+        (id)
+    )
+    post = cursor.fetchone()
+    conn.commit()
     
     if not post:
         raise HTTPException(
