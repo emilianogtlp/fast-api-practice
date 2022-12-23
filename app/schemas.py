@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel,EmailStr
 from datetime import datetime
 
 # Class for the input of information
@@ -12,6 +12,9 @@ class PostBase(BaseModel):
 class PostCreate(PostBase):
     pass
 
+class UserCreate(BaseModel):
+    email: EmailStr
+    password: str
 
 # Class for the response (hides sensitive data, ej.passwords, dates, etc)
 
@@ -20,4 +23,12 @@ class ResponsePost(PostBase): #inherits from PostBase title, content and publish
     created_at: datetime
 
     class Config: # Needed to be able to send something that is not a dict
+        orm_mode = True
+
+class ResponseUser(BaseModel):
+    idUser: int
+    email:EmailStr
+    created_at: datetime
+
+    class Config:
         orm_mode = True
