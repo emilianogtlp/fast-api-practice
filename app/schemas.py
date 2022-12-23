@@ -1,4 +1,7 @@
 from pydantic import BaseModel
+from datetime import datetime
+
+# Class for the input of information
 
 class PostBase(BaseModel):
     title: str
@@ -9,3 +12,12 @@ class PostBase(BaseModel):
 class PostCreate(PostBase):
     pass
 
+
+# Class for the response (hides sensitive data, ej.passwords, dates, etc)
+
+class ResponsePost(PostBase): #inherits from PostBase title, content and published
+    idPost: int
+    created_at: datetime
+
+    class Config: # Needed to be able to send something that is not a dict
+        orm_mode = True

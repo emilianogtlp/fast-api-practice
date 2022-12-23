@@ -2,7 +2,7 @@ from fastapi import FastAPI, Response, status, HTTPException, Depends
 from fastapi.params import Body
 
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List
 
 from random import randrange
 
@@ -39,15 +39,15 @@ def root():
     return {"Hello":"World"}
 
 
-@app.get("/posts")
+@app.get("/posts",response_model=List[schemas.ResponsePost]) # We use List because the response is not one dict, but a list of dicts
 def get_posts(db: Session = Depends(get_db)):
     
     posts = db.query(models.Post).all()
     
-    return {"data":posts}
+    return posts
 
 
-@app.post("/posts",status_code=status.HTTP_201_CREATED)
+@app.post("/posts",status_code=status.HTTP_201_CREATED,response_model=schemas.ResponsePost)
 def create_posts(post:schemas.PostCreate,db: Session = Depends(get_db)):
     
     new_post = models.Post(
@@ -58,10 +58,10 @@ def create_posts(post:schemas.PostCreate,db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_post)
     
-    return {"data":new_post}
+    return new_post
 
 
-@app.get("/posts/{id}") #Path parameter
+@app.get("/posts/{id}",response_model=schemas.ResponsePost) #Path parameter
 def get_post(id:int, response: Response, db: Session = Depends(get_db)):
     post = db.query(models.Post).filter(models.Post.idPost == id).first()
     
@@ -70,7 +70,7 @@ def get_post(id:int, response: Response, db: Session = Depends(get_db)):
             status_code = status.HTTP_404_NOT_FOUND
             , detail=f"Post with id {id} was not found")
     
-    return {"post_detail":post}
+    return post
 
 
 @app.delete("/posts/{id}",status_code=status.HTTP_204_NO_CONTENT)
@@ -87,7 +87,7 @@ def delete_post(id:int,db: Session = Depends(get_db)):
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
-@app.put("/posts/{id}",status_code=status.HTTP_200_OK)
+@app.put("/posts/{id}",status_code=status.HTTP_200_OK,response_model=schemas.ResponsePost)
 def update_post(id:int, post:schemas.PostCreate, db: Session = Depends(get_db)):
     updated_post = db.query(models.Post).filter(models.Post.idPost == id)
 
@@ -98,5 +98,5 @@ def update_post(id:int, post:schemas.PostCreate, db: Session = Depends(get_db)):
     updated_post.update(post.dict(),synchronize_session = False)
     db.commit()
 
-    return {'data':updated_post.first()}
+    return updated_post.first()
 
