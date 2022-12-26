@@ -16,6 +16,10 @@ class UserCreate(BaseModel):
     email: EmailStr
     password: str
 
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str
+
 # Class for the response (hides sensitive data, ej.passwords, dates, etc)
 
 class ResponsePost(PostBase): #inherits from PostBase title, content and published
