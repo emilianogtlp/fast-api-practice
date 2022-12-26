@@ -8,7 +8,7 @@ class PostBase(BaseModel):
     title: str
     content: str
     published: bool = True #If the user does not provide a value, de default is True
-    #rating: Optional[int] = None #Optional field with a default value of none/null
+    
 
 class PostCreate(PostBase):
     pass
@@ -29,6 +29,7 @@ class TokenData(BaseModel):
 class ResponsePost(PostBase): #inherits from PostBase title, content and published
     idPost: int
     created_at: datetime
+    idUser: int
 
     class Config: # Needed to be able to send something that is not a dict
         orm_mode = True
