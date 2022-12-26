@@ -1,5 +1,6 @@
 from pydantic import BaseModel,EmailStr
 from datetime import datetime
+from typing import Optional
 
 # Class for the input of information
 
@@ -20,6 +21,9 @@ class UserLogin(BaseModel):
     email: EmailStr
     password: str
 
+class TokenData(BaseModel):
+    id: Optional[str] = None
+
 # Class for the response (hides sensitive data, ej.passwords, dates, etc)
 
 class ResponsePost(PostBase): #inherits from PostBase title, content and published
@@ -36,3 +40,7 @@ class ResponseUser(BaseModel):
 
     class Config:
         orm_mode = True
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
