@@ -3,15 +3,16 @@ from datetime import datetime, timedelta
 from . import schemas, database, models
 from fastapi import Depends, status, HTTPException
 from fastapi.security import OAuth2PasswordBearer
-from sqlalchemy.orm import Session   
+from sqlalchemy.orm import Session
+from .config import settings 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='login')
 
 # As this is a portfolio project without any real word data the secret key is shared
 # To generate a secret key is recommended to run de command: openssl rand -hex 32
-SECRET_KEY = "a78bfe0b0008b8ef39604f125d747b298d6d83d45661e894629ceb544b0f80c6"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+SECRET_KEY = settings.secret_key
+ALGORITHM = settings.algorithm
+ACCESS_TOKEN_EXPIRE_MINUTES = settings.access_token_expire_minutes
 
 def create_access_token(data:dict):
     to_encode = data.copy()
