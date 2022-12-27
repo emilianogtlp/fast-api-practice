@@ -17,3 +17,16 @@ def get_db():
         yield db
     finally:
         db.close()
+
+''' #USE TO CONNCET TO A PSQL DB BY PSYCOPG2 LIBRARY
+while True:
+    try:
+        conn = psycopg2.connect(host='localhost',database='fastapi',user='postgres',password='password123',cursor_factory=RealDictCursor)
+        cursor = conn.cursor()
+        print("Database connection was succesful.")
+        break
+    except Exception as error:
+        print(error)
+        print("Connection to database failed")
+        time.sleep(3)
+'''

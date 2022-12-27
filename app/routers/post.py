@@ -2,7 +2,7 @@ from fastapi import FastAPI, Response, status, HTTPException, Depends, APIRouter
 from .. import models,schemas,oauth2
 from app.database import get_db
 from sqlalchemy.orm import Session
-from typing import  List
+from typing import  List, Optional
 
 router = APIRouter(
     prefix="/posts",
@@ -10,12 +10,16 @@ router = APIRouter(
 )
 
 @router.get("/",response_model=List[schemas.ResponsePost]) # We use List because the response is not one dict, but a list of dicts
-def get_posts(db: Session = Depends(get_db), user_id:int = Depends(oauth2.get_current_user)):
-    
-    posts = db.query(models.Post).all()
+def get_posts(
+    db: Session = Depends(get_db),
+    user_id:int = Depends(oauth2.get_current_user),
+    limit:int = 10,
+    skip:int = 0,
+    search: Optional[str] = ""
+    ):
+    posts = db.query(models.Post).filter(models.Post.title.contains(search)).limit(limit).offset(skip).all()
     
     return posts
-
 
 @router.post("/",status_code=status.HTTP_201_CREATED,response_model=schemas.ResponsePost)
 def create_posts(post:schemas.PostCreate,db: Session = Depends(get_db), current_user:int = Depends(oauth2.get_current_user)):
@@ -33,7 +37,6 @@ def create_posts(post:schemas.PostCreate,db: Session = Depends(get_db), current_
 
 @router.get("/{id}",response_model=schemas.ResponsePost) #Path parameter
 def get_post(id:int, db: Session = Depends(get_db), current_user:int = Depends(oauth2.get_current_user)):
-    print(current_user.idUser)
     post = db.query(models.Post).filter(models.Post.idPost == id).first()
     
     if not post:
