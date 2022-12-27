@@ -25,15 +25,6 @@ class TokenData(BaseModel):
     id: Optional[str] = None
 
 # Class for the response (hides sensitive data, ej.passwords, dates, etc)
-
-class ResponsePost(PostBase): #inherits from PostBase title, content and published
-    idPost: int
-    created_at: datetime
-    idUser: int
-
-    class Config: # Needed to be able to send something that is not a dict
-        orm_mode = True
-
 class ResponseUser(BaseModel):
     idUser: int
     email:EmailStr
@@ -45,3 +36,14 @@ class ResponseUser(BaseModel):
 class Token(BaseModel):
     access_token: str
     token_type: str
+    
+class ResponsePost(PostBase): #inherits from PostBase title, content and published
+    idPost: int
+    created_at: datetime
+    idUser: int
+    owner: ResponseUser
+
+    class Config: # Needed to be able to send something that is not a dict
+        orm_mode = True
+
+
