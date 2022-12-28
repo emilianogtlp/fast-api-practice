@@ -38,9 +38,15 @@ def create_posts(post:schemas.PostCreate,db: Session = Depends(get_db), current_
     return new_post
 
 
-@router.get("/{id}",response_model=schemas.ResponsePost) #Path parameter
+@router.get("/{id}",response_model=schemas.ResponsePostVote) #Path parameter
 def get_post(id:int, db: Session = Depends(get_db), current_user:int = Depends(oauth2.get_current_user)):
-    post = db.query(models.Post).filter(models.Post.idPost == id).first()
+    post = db.query(
+        models.Post, func.count(models.Vote.idPost).label("Votes")
+        ).join(
+            models.Vote, models.Post.idPost == models.Vote.idPost, isouter=True
+            ).group_by(
+                models.Post.idPost
+            ).filter(models.Post.idPost == id).first()
     
     if not post:
         raise HTTPException(
