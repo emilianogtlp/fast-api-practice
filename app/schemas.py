@@ -50,6 +50,16 @@ class ResponsePost(PostBase): #inherits from PostBase title, content and publish
     class Config: # Needed to be able to send something that is not a dict
         orm_mode = True
 
+# Used in route /get
+class ResponsePostVote(BaseModel):
+    Post: ResponsePost
+    Votes: int
+
+    class Config:
+        orm_mode = True
+
+
+# Used in route /vote
 class ResponseVote(VoteIn):
     idUser: int
 
