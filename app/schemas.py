@@ -1,4 +1,4 @@
-from pydantic import BaseModel,EmailStr
+from pydantic import BaseModel,EmailStr, conint
 from datetime import datetime
 from typing import Optional
 
@@ -24,6 +24,10 @@ class UserLogin(BaseModel):
 class TokenData(BaseModel):
     id: Optional[str] = None
 
+class VoteIn(BaseModel):
+    idPost: int
+    dir:conint(le=1,ge=0)
+
 # Class for the response (hides sensitive data, ej.passwords, dates, etc)
 class ResponseUser(BaseModel):
     idUser: int
@@ -46,4 +50,8 @@ class ResponsePost(PostBase): #inherits from PostBase title, content and publish
     class Config: # Needed to be able to send something that is not a dict
         orm_mode = True
 
+class ResponseVote(VoteIn):
+    idUser: int
 
+    class Config:
+        orm_mode = True
