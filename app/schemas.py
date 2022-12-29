@@ -61,7 +61,7 @@ class ResponsePostVote(BaseModel):
 
 # Used in route /vote
 class ResponseVote(VoteIn):
-    idUser: int
+    User: ResponseUser
 
     class Config:
-        orm_mode = True
+        orm_mode = True    

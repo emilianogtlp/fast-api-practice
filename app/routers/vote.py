@@ -12,15 +12,16 @@ router = APIRouter(
 def vote(vote: schemas.VoteIn , db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
     vote_query = db.query(models.Vote).filter(models.Vote.idPost == vote.idPost, models.Vote.idUser == current_user.idUser)
     found_vote = vote_query.first()
-    response = schemas.ResponseVote(**vote.dict(), idUser=current_user.idUser)
     
+    user_dict = db.query(models.User).filter(models.User.idUser == current_user.idUser).first()
+    response = schemas.ResponseVote(dir=vote.dir,idPost=vote.idPost, User=user_dict)
+
     if (vote.dir == 1):
         if found_vote:
             raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=f"User {current_user.idUser} has already voted on post {vote.idPost}")
         new_vote = models.Vote(idPost = vote.idPost, idUser = current_user.idUser)
         db.add(new_vote)
         db.commit()
-        
         return response
     
     else:
