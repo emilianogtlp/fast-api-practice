@@ -16,8 +16,8 @@ def get_posts(
     user_id:int = Depends(oauth2.get_current_user),
     limit:int = 10,
     skip:int = 0,
-    search: Optional[str] = ""
-    ):
+    search: Optional[str] = ""):
+
     posts = db.query(models.Post,func.count(
         models.Vote.idPost).label("Votes")).join(
             models.Vote, models.Post.idPost == models.Vote.idPost, isouter=True
